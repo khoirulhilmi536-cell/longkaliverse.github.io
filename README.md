@@ -1,2 +1,117 @@
 # longkaliverse.github.io
 Kota virtual 
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>LongkaliVerse 3D FIX</title>
+<!-- CDN BARU YANG LEBIH KUAT -->
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;-webkit-tap-highlight-color:transparent}body{background:#0a1a2e;color:white;padding-bottom:85px}.header{background:#0f4c4c;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}.logo{font-size:24px;font-weight:900}.logo span{color:#ff9d2e}.day{background:#ff8c00;padding:5px 10px;border-radius:8px;font-weight:800;font-size:13px}.marquee{background:#ffcc00;color:#333;padding:8px;white-space:nowrap;overflow:hidden;font-weight:700;font-size:14px}.marquee span{display:inline-block;animation:j 18s linear infinite}@keyframes j{from{transform:translateX(100%)}to{transform:translateX(-100%)}}.page{display:none;padding:15px}.page.active{display:block}.white{background:white;color:#333;border-radius:15px;padding:20px;text-align:center;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}.top-info{background:#fffdf2;color:#0f4c4c;border-radius:15px;padding:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#gameWrap{position:relative;height:540px;border-radius:20px;overflow:hidden;border:3px solid #1a2a3a;background:#87CEEB}#gameCanvas{width:100%;height:100%;display:block;touch-action:none;background:#87CEEB}.hud{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.65);padding:8px 12px;border-radius:12px;font-size:13px;font-weight:800;z-index:5}.hud2{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.65);padding:8px 12px;border-radius:12px;font-size:11px;z-index:5}.cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.7;pointer-events:none;z-index:4}
+#fallback2D{display:none;position:absolute;inset:0;background:#16283d;z-index:6}#fallback2D .p2d{position:absolute;width:900px;height:900px;background:#16283d}#player2D{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:32px;z-index:10;text-align:center}
+.kontrol{margin-top:12px;background:white;border-radius:15px;padding:12px;color:#333}.joy{display:flex;justify-content:center;gap:15px;align-items:center}.joy-tengah{display:flex;flex-direction:column;gap:8px;align-items:center}.joy-btn{width:62px;height:62px;border-radius:50%;border:3px solid #0f4c4c;background:#e6f5f5;font-size:26px;touch-action:none;user-select:none}.joy-btn:active{background:#ffcc00;transform:scale(.92)}.info-jalan{background:#fff3cd;color:#333;padding:10px;border-radius:10px;font-size:13px;margin-top:10px;text-align:center;font-weight:700}.btn-3d{padding:9px 14px;border:none;border-radius:20px;font-weight:800;cursor:pointer}.nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:8px 0 12px;z-index:99}.nav button{background:none;border:none;color:#666;text-align:center;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:5px 8px}.nav button.active{color:#0f4c4c;background:#e6f5f5;border-radius:20px}.nav span{font-size:20px}</style></head>
+<body>
+<div class="header"><div class="logo">Longkali<span>Verse</span> <span class="day">DAY 1</span></div><div><span style="background:#e74c3c;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:900">● 3D FIX</span></div></div>
+<div class="marquee"><span id="marqueeTxt">📣 LongkaliVerse 3D FIX! Kalau masih biru, klik tombol MODE 2D di bawah!</span></div>
+
+<div id="page-peta" class="page active">
+<div class="top-info"><div><small>WARGA</small><h1>4.000</h1></div><div style="background:#0f4c4c;color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800">📍 <span id="lokasiTxt">Jl. Poros Longkali</span></div></div>
+
+<div id="gameWrap">
+<canvas id="gameCanvas"></canvas>
+<!-- MODE DARURAT 2D - MUNCUL KALAU 3D GAGAL -->
+<div id="fallback2D"><div class="p2d" id="map2D"></div><div id="player2D">🧑<br><span style="font-size:9px;background:#0f4c4c;padding:2px 6px;border-radius:10px">KAMU</span></div></div>
+<div class="hud">🧑 <span id="namaHUD">KAMU</span><br><small id="posHUD">X:0 Z:10</small><br><small id="status3D" style="color:#ffcc00">⏳ Loading 3D...</small></div>
+<div class="hud2">🎥 Geser = Putar Kamera<br>🕹️ Tombol = Jalan<br>Langkah: <b id="langkahHUD">0</b></div>
+<div class="cross">+</div>
+</div>
+
+<div class="kontrol"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><b>🎮 Kontrol</b><div><button class="btn-3d" style="background:#0f4c4c;color:white" onclick="gantiView()">📷 Kamera</button> <button class="btn-3d" style="background:#333;color:white" onclick="paksa2D()">🔄 Mode 2D</button> <button class="btn-3d" style="background:#ff8c00;color:white" onclick="resetPos()">📍 Reset</button></div></div>
+<div class="joy" style="margin-top:12px"><button class="joy-btn" id="btnKiri">◀</button><div class="joy-tengah"><button class="joy-btn" id="btnAtas">▲</button><button class="joy-btn" onclick="gantiChar()" style="background:#ff8c00;color:white">🎲</button><button class="joy-btn" id="btnBawah">▼</button></div><button class="joy-btn" id="btnKanan">▶</button></div>
+<div class="info-jalan" id="infoJalan">👋 Teken ▲ buat maju! Kalau layar masih biru, klik tombol 🔄 Mode 2D di atas!</div>
+<div style="display:flex;gap:8px;margin-top:10px"><button class="btn-3d" style="flex:1;background:#2a4a7a;color:white;padding:12px" onclick="teleport('pasar')">🛒 Pasar</button><button class="btn-3d" style="flex:1;background:#0f6a3a;color:white;padding:12px" onclick="teleport('masjid')">🕌 Masjid</button><button class="btn-3d" style="flex:1;background:#8a6a00;color:white;padding:12px" onclick="teleport('warung')">🏪 Warung</button></div>
+</div>
+</div>
+
+<div id="page-info" class="page"><div class="white"><h2>📢 Info</h2><p>LongkaliVerse 3D FIX udah rilis!</p></div></div>
+<div id="page-ktp" class="page"><div class="white"><h2>🪪 KTP</h2><input id="namaKTP" placeholder="Nama lu" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:10px"><button onclick="buatKTP()" style="width:100%;background:#ff8c00;color:white;border:none;padding:13px;border-radius:10px;font-weight:900;margin-top:10px">✨ BIKIN KTP</button><p id="hasilKTP"></p></div></div>
+<div id="page-klasemen" class="page"><div class="white"><h2>🏆 Klasemen</h2><p>1. Pita - 1250 poin 👑<br>2. Andi - 980 poin</p></div></div>
+<div id="page-pemilu" class="page"><div class="white"><h2>🗳️ Pemilu</h2><p>Segera hadir</p></div></div>
+<div id="page-donasi" class="page"><div class="white"><h2>💖 Donasi</h2><p>Segera hadir</p></div></div>
+<div id="page-akun" class="page"><div class="white"><h2>✅ Akun</h2><p>Nama: <b id="akunNama">Warga Longkali</b><br>Langkah: <b id="langkah">0</b><br>Mode: <b id="modeTxt">3D</b></p></div></div>
+
+<div class="nav"><button onclick="pindah('peta')" id="nav-peta" class="active"><span>🗺️</span>Peta</button><button onclick="pindah('info')" id="nav-info"><span>📢</span>Info</button><button onclick="pindah('ktp')" id="nav-ktp"><span>🪪</span>KTP</button><button onclick="pindah('klasemen')" id="nav-klasemen"><span>🏆</span>Klasemen</button><button onclick="pindah('pemilu')" id="nav-pemilu"><span>🗳️</span>Pemilu</button><button onclick="pindah('donasi')" id="nav-donasi"><span>💖</span>Donasi</button><button onclick="pindah('akun')" id="nav-akun"><span>✅</span>Akun</button></div>
+
+<script>
+let px=0, pz=10, rotY=0, camMode=0, langkah=0, mode2D=false, threeOK=false;
+let player, badan, scene, camera, renderer, canvas=document.getElementById('gameCanvas');
+let buildings=[{x:-18,z:-18,nama:'Rumah Pita',emoji:'🏠'},{x:18,z:-18,nama:'Masjid Al-Ikhlas',emoji:'🕌'},{x:-18,z:18,nama:'Pasar Longkali',emoji:'🛒'},{x:18,z:18,nama:'Warung Bu Tini',emoji:'🏪'},{x:0,z:-32,nama:'Balai Desa',emoji:'🏛️'}];
+
+// === COBA LOAD 3D, KALAU GAGAL OTOMATIS PINDAH 2D ===
+function init3D(){
+  try{
+    if(typeof THREE==='undefined'){ throw new Error('THREE gagal load'); }
+    scene=new THREE.Scene(); scene.background=new THREE.Color(0x87CEEB); scene.fog=new THREE.Fog(0x87CEEB,60,140);
+    camera=new THREE.PerspectiveCamera(75, 360/540, 0.1, 300);
+    renderer=new THREE.WebGLRenderer({canvas:canvas, antialias:true}); 
+    let W=canvas.parentElement.clientWidth||360, H=540; renderer.setSize(W,H); camera.aspect=W/H; camera.updateProjectionMatrix();
+    renderer.shadowMap.enabled=true;
+    let light=new THREE.DirectionalLight(0xffffff,1.1); light.position.set(30,50,20); light.castShadow=true; scene.add(light); scene.add(new THREE.AmbientLight(0xffffff,0.6));
+    let ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120), new THREE.MeshLambertMaterial({color:0x4a9a4a})); ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+    function jalan(x,z,w,d){ let m=new THREE.Mesh(new THREE.BoxGeometry(w,0.2,d), new THREE.MeshLambertMaterial({color:0x333333})); m.position.set(x,0.1,z); scene.add(m); }
+    jalan(0,0,120,8); jalan(0,0,8,120);
+    function bangunan(x,z,w,h,d,warna,atap){
+      let g=new THREE.Group(); let box=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color:warna})); box.position.y=h/2; box.castShadow=true; g.add(box);
+      let roof=new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)*0.75,3,4), new THREE.MeshLambertMaterial({color:atap})); roof.position.y=h+1.5; roof.rotation.y=Math.PI/4; g.add(roof); g.position.set(x,0,z); scene.add(g);
+    }
+    bangunan(-18,-18,10,6,10,0xE8D8C0,0x8B0000); bangunan(18,-18,12,8,10,0xFFFFFF,0x2a4a7a); bangunan(-18,18,12,5,10,0xFFD700,0x8a6a00); bangunan(18,18,10,6,10,0xFFA07A,0x333333); bangunan(0,-32,10,7,10,0xCCCCCC,0x333333);
+    function pohon(x,z){ let g=new THREE.Group(); let bt=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.5,3,8), new THREE.MeshLambertMaterial({color:0x8B4513})); bt.position.y=1.5; g.add(bt); let dn=new THREE.Mesh(new THREE.SphereGeometry(2,10,10), new THREE.MeshLambertMaterial({color:0x228B22})); dn.position.y=4; dn.castShadow=true; g.add(dn); g.position.set(x,0,z); scene.add(g); }
+    for(let i=0;i<12;i++) pohon(Math.random()*80-40, Math.random()*80-40);
+    player=new THREE.Group(); badan=new THREE.Mesh(new THREE.BoxGeometry(1,1.6,0.6), new THREE.MeshLambertMaterial({color:0x0f4c4c})); badan.position.y=1.2; badan.castShadow=true; player.add(badan);
+    let kepala=new THREE.Mesh(new THREE.BoxGeometry(0.9,0.9,0.9), new THREE.MeshLambertMaterial({color:0xFFDAB9})); kepala.position.y=2.5; player.add(kepala);
+    let topi=new THREE.Mesh(new THREE.BoxGeometry(1,0.3,1), new THREE.MeshLambertMaterial({color:0xff8c00})); topi.position.y=3.05; player.add(topi); scene.add(player); player.position.set(px,0,pz);
+    threeOK=true; document.getElementById('status3D').innerText='✅ 3D Jalan!'; document.getElementById('status3D').style.color='#25D366';
+    animate3D();
+  }catch(e){ console.log('3D gagal:',e); paksa2D(); }
+}
+function animate3D(){ if(!threeOK||mode2D) return; requestAnimationFrame(animate3D); updateCamera(); renderer.render(scene,camera); }
+function updateCamera(){ if(!threeOK) return; if(camMode==0){ camera.position.set(px-Math.sin(rotY)*8,5,pz-Math.cos(rotY)*8); camera.lookAt(px,2,pz); } else if(camMode==1){ camera.position.set(px,32,pz+0.1); camera.lookAt(px,0,pz); } else { camera.position.set(px+Math.sin(rotY)*8,5,pz+Math.cos(rotY)*8); camera.lookAt(px,2,pz); } }
+
+function paksa2D(){
+  mode2D=true; document.getElementById('fallback2D').style.display='block'; document.getElementById('modeTxt').innerText='2D (Darurat)'; document.getElementById('status3D').innerText='🔄 Mode 2D - Tetep Bisa Jalan!'; document.getElementById('status3D').style.color='#ffcc00';
+  document.getElementById('infoJalan').innerText='✅ Mode 2D aktif! Sekarang pasti bisa jalan. Pake tombol ▲ buat maju!';
+  render2D(); update2D();
+}
+function render2D(){
+  let m=document.getElementById('map2D'); m.innerHTML='<div style="position:absolute;background:#2a3a4a;height:55px;width:900px;top:200px;left:0"></div><div style="position:absolute;background:#2a3a4a;width:55px;height:900px;left:250px;top:0"></div>';
+  // Bangunan 2D - posisi dikonversi dari 3D ke 2D (x+450, z+450)
+  buildings.forEach(b=>{ let bx=b.x+450, by=b.z+450; m.innerHTML+='<div style="position:absolute;left:'+bx+'px;top:'+by+'px;width:120px;height:80px;background:#7a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;text-align:center;font-size:12px">'+b.emoji+'<br>'+b.nama+'</div>'; });
+  m.innerHTML+='<div style="position:absolute;left:400px;top:100px;background:white;color:#333;padding:4px 8px;border-radius:6px;font-weight:800;font-size:11px">🕌 Masjid</div><div style="position:absolute;left:400px;top:600px;background:white;color:#333;padding:4px 8px;border-radius:6px;font-weight:800;font-size:11px">🛒 Pasar</div>';
+}
+function update2D(){
+  if(!mode2D) return; let w=document.getElementById('gameWrap').clientWidth, h=540;
+  // Konversi posisi 3D ke posisi peta 2D
+  let mapX=px+450, mapY=pz+450;
+  let tx=Math.min(0,Math.max(w-900, w/2-mapX)), ty=Math.min(0,Math.max(h-900, h/2-mapY));
+  document.getElementById('map2D').style.transform='translate('+tx+'px,'+ty+'px)';
+}
+
+function gerak(dx,dz){ px+=dx; pz+=dz; px=Math.max(-55,Math.min(55,px)); pz=Math.max(-55,Math.min(55,pz)); langkah++; document.getElementById('langkah').innerText=langkah; document.getElementById('langkahHUD').innerText=langkah; document.getElementById('posHUD').innerText='X:'+Math.floor(px)+' Z:'+Math.floor(pz); if(threeOK&&!mode2D&&player){ player.position.set(px,0,pz); player.rotation.y=rotY; } if(mode2D) update2D();
+  let lok='Jl. Poros Longkali'; let info='🚶‍♂️ Lagi jalan... Langkah:'+langkah; buildings.forEach(b=>{ if(Math.abs(px-b.x)<8 && Math.abs(pz-b.z)<8){ lok=b.nama; info=b.emoji+' Kamu di '+b.nama+'!'; } }); document.getElementById('lokasiTxt').innerText=lok; document.getElementById('infoJalan').innerText=info;
+}
+function gantiView(){ camMode=(camMode+1)%3; document.getElementById('infoJalan').innerText='📷 Kamera mode '+(camMode==0?'Belakang':camMode==1?'Drone Atas':'Depan')+'!'; }
+function resetPos(){ px=0; pz=10; rotY=0; gerak(0,0); }
+function teleport(t){ if(t=='pasar'){ px=-18; pz=18; } if(t=='masjid'){ px=18; pz=-18; } if(t=='warung'){ px=18; pz=18; } gerak(0,0); }
+function gantiChar(){ let warna=[0x0f4c4c,0xff8c00,0xe74c3c,0x8a2be2]; if(badan) badan.material.color.setHex(warna[Math.floor(Math.random()*warna.length)]); document.getElementById('infoJalan').innerText='🎲 Baju ganti warna!'; }
+function buatKTP(){ let n=document.getElementById('namaKTP').value||'Warga Longkali'; document.getElementById('namaHUD').innerText=n.toUpperCase(); document.getElementById('akunNama').innerText=n; document.getElementById('hasilKTP').innerText='✅ KTP '+n+' jadi!'; }
+function pindah(n){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById('page-'+n).classList.add('active'); document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); document.getElementById('nav-'+n).classList.add('active'); }
+function tahan(btn, fn){ let iv; let s=e=>{ e.preventDefault(); e.stopPropagation(); fn(); iv=setInterval(fn,70); }; let st=()=>clearInterval(iv); btn.addEventListener('touchstart',s,{passive:false}); btn.addEventListener('touchend',st); btn.addEventListener('touchcancel',st); btn.addEventListener('mousedown',s); btn.addEventListener('mouseup',st); btn.addEventListener('mouseleave',st); }
+// FIX: Tombol kiri/kanan = BELOK, tombol atas = MAJU sesuai arah kamera
+tahan(document.getElementById('btnAtas'), ()=>gerak(Math.sin(rotY)*0.7, Math.cos(rotY)*0.7));
+tahan(document.getElementById('btnBawah'), ()=>gerak(-Math.sin(rotY)*0.7, -Math.cos(rotY)*0.7));
+tahan(document.getElementById('btnKiri'), ()=>{ rotY+=0.14; if(player) player.rotation.y=rotY; if(mode2D) update2D(); });
+tahan(document.getElementById('btnKanan'), ()=>{ rotY-=0.14; if(player) player.rotation.y=rotY; if(mode2D) update2D(); });
+let lastX=null; canvas.addEventListener('touchmove', e=>{ if(lastX!==null) rotY-=(e.touches[0].clientX-lastX)*0.01; lastX=e.touches[0].clientX; }, {passive:true});
+canvas.addEventListener('touchend', ()=>{ lastX=null; });
+document.addEventListener('keydown', e=>{ if(e.key=='w'||e.key=='ArrowUp') gerak(Math.sin(rotY)*0.8, Math.cos(rotY)*0.8); if(e.key=='s'||e.key=='ArrowDown') gerak(-Math.sin(rotY)*0.8, -Math.cos(rotY)*0.8); if(e.key=='a'||e.key=='ArrowLeft') rotY+=0.15; if(e.key=='d'||e.key=='ArrowRight') rotY-=0.15; });
+window.addEventListener('load', ()=>{ setTimeout(init3D, 300); });
+setTimeout(()=>{ if(!threeOK && !mode2D){ document.getElementById('status3D').innerText='⚠️ 3D lambat, klik Mode 2D!'; } }, 4000);
+</script></body></html>
