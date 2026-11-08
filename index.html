@@ -51,10 +51,12 @@ let label=document.createElement('div');label.style.display='none';return g;
 // === DAFTAR RUMAH - COPY DARI ADMIN KE SINI ===
 // ===============================================
 
-// POHON
-function tree(x,z){let g=new THREE.Group();let t=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,3),new THREE.MeshLambertMaterial({color:0x78350f}));t.position.y=1.5;g.add(t);let d=new THREE.Mesh(new THREE.SphereGeometry(2.2,8,8),new THREE.MeshLambertMaterial({color:0x166534}));d.position.y=4;g.add(d);g.position.set(x,0,z);scene.add(g);}
-for(let i=0;i<20;i++){tree(-40+Math.random()*80,-40+Math.random()*80);}
-
+//POHON
+function pohon(x,z){var t=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,3),new THREE.MeshLambertMaterial({color:0x78350f}));t.position.set(x,1.5,z);scene.add(t);var d=new THREE.Mesh(new THREE.SphereGeometry(2.2,8,8),new THREE.MeshLambertMaterial({color:0x166534}));d.position.set(x,4,z);scene.add(d);}
+// POHON POSISI TETAP - GAK AKAN PINDAH LAGI
+pohon(-25,-25);pohon(-25,25);pohon(25,-25);pohon(25,25);
+pohon(-35,0);pohon(35,0);pohon(0,-35);pohon(0,35);
+pohon(-10,-30);pohon(10,-30);pohon(-10,30);pohon(10,30);
 // PEMAIN - MOTOR / ORANG
 let player=new THREE.Group();
 let bodyP=new THREE.Mesh(new THREE.BoxGeometry(1,2,0.6),new THREE.MeshLambertMaterial({color:0xfacc15}));bodyP.position.y=1;player.add(bodyP);
