@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>LongkaliVerse - 3D</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{font-family:Arial;overflow:hidden;background:#000;color:#fff}
+#game{position:fixed;inset:0}
+#hud{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:10}
+#hud b{background:rgba(0,0,0,.6);padding:8px 12px;border-radius:20px;font-size:13px}
+#hud b span{color:#facc15}
+#joy{position:fixed;bottom:20px;left:20px;width:110px;height:110px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.4);border-radius:50%;z-index:10}
+#knob{position:absolute;width:48px;height:48px;background:#facc15;border-radius:50%;left:31px;top:31px;box-shadow:0 4px 10px rgba(0,0,0,.4)}
+#btns{position:fixed;bottom:24px;right:16px;display:flex;gap:10px;z-index:10}
+#btns button{width:58px;height:58px;border-radius:50%;border:none;font-size:22px;background:rgba(255,255,255,.9)}
+#info{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);padding:8px 14px;border-radius:20px;font-size:13px;white-space:nowrap;z-index:10}
+#start{position:fixed;inset:0;background:linear-gradient(180deg,#0f766e,#0f172a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;text-align:center;padding:20px}
+#start h1{font-size:34px;line-height:1.1}#start h1 span{color:#facc15}#start p{margin:12px 0 20px;color:#cbd5e1;font-size:14px}
+#start button{padding:14px 28px;border:none;border-radius:14px;background:#facc15;font-weight:800;font-size:16px}
+#start small{margin-top:14px;color:#94a3b8;font-size:12px}</style></head>
+<body>
+<div id="game"></div>
+<div id="hud"><b>🏠 Longkali<span>Verse</span></b><b>📍 Longkali</b></div>
+<div id="info">Selamat datang di Longkali! Jalan-jalan keliling desa</div>
+<div id="joy"><div id="knob"></div></div>
+<div id="btns"><button onclick="jump()">⬆️</button><button onclick="honk()">📯</button></div>
+
+<div id="start"><h1>Longkali<br><span>Verse</span> 🏠</h1><p>Desa Longkali versi 3D.<br>Jalan-jalan, liat rumah warga, keliling desa.</p><button onclick="startGame()">▶️ MULAI JALAN-JALAN</button><small>Mode 3D • Tanpa 2D • HP & Laptop bisa</small></div>
+
+<script>
+let scene=new THREE.Scene();scene.background=new THREE.Color(0x87ceeb);scene.fog=new THREE.Fog(0x87ceeb,40,110);
+let cam=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,300);
+let ren=new THREE.WebGLRenderer({antialias:true});ren.setSize(innerWidth,innerHeight);ren.shadowMap.enabled=true;document.getElementById('game').appendChild(ren.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,0.9));let sun=new THREE.DirectionalLight(0xffffff,0.8);sun.position.set(20,40,20);scene.add(sun);
+
+// TANAH
+let ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshLambertMaterial({color:0x4ade80}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+// JALAN UTAMA
+function road(w,l,x,z,rot){let r=new THREE.Mesh(new THREE.PlaneGeometry(w,l),new THREE.MeshLambertMaterial({color:0x334155}));r.rotation.x=-Math.PI/2;r.rotation.z=rot||0;r.position.set(x,0.02,z);scene.add(r);
+for(let i=-40;i<40;i+=6){let g=new THREE.Mesh(new THREE.PlaneGeometry(0.4,2),new THREE.MeshBasicMaterial({color:0xfacc15}));g.rotation.x=-Math.PI/2;g.rotation.z=rot||0;g.position.set(x,0.03,z+i);scene.add(g);}}
+road(8,120,0,0);road(120,8,0,0);
+
+// FUNGSI RUMAH - INI YANG DIUBAH DARI ADMIN
+function house(x,z,wall,roof,name){
+let g=new THREE.Group();
+let body=new THREE.Mesh(new THREE.BoxGeometry(9,5,9),new THREE.MeshLambertMaterial({color:wall}));body.position.y=2.5;body.castShadow=true;g.add(body);
+let atap=new THREE.Mesh(new THREE.ConeGeometry(7.5,3.5,4),new THREE.MeshLambertMaterial({color:roof}));atap.position.y=6.7;atap.rotation.y=Math.PI/4;g.add(atap);
+let door=new THREE.Mesh(new THREE.BoxGeometry(2,3,0.2),new THREE.MeshLambertMaterial({color:0x92400e}));door.position.set(0,1.5,4.6);g.add(door);
+let w1=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.6,0.2),new THREE.MeshLambertMaterial({color:0xbae6fd}));w1.position.set(-2.5,3,4.6);g.add(w1);
+let w2=w1.clone();w2.position.x=2.5;g.add(w2);
+g.position.set(x,0,z);scene.add(g);
+let label=document.createElement('div');label.style.display='none';return g;
+}
+// === DAFTAR RUMAH - COPY DARI ADMIN KE SINI ===
+// ADMIN 3D LENGKAP - 1 bangunan + 0 jalan
+rumah(5,-1,0xffffff,0xdc2626,'toko',3,0); // minimalis 1
+
+// ===============================================
+
+//POHON
+function pohon(x,z){var t=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,3),new THREE.MeshLambertMaterial({color:0x78350f}));t.position.set(x,1.5,z);scene.add(t);var d=new THREE.Mesh(new THREE.SphereGeometry(2.2,8,8),new THREE.MeshLambertMaterial({color:0x166534}));d.position.set(x,4,z);scene.add(d);}
+// POHON POSISI TETAP - GAK AKAN PINDAH LAGI
+pohon(-25,-25);pohon(-25,25);pohon(25,-25);pohon(25,25);
+pohon(-35,0);pohon(35,0);pohon(0,-35);pohon(0,35);
+pohon(-10,-30);pohon(10,-30);pohon(-10,30);pohon(10,30);
+// PEMAIN - MOTOR / ORANG
+let player=new THREE.Group();
+let bodyP=new THREE.Mesh(new THREE.BoxGeometry(1,2,0.6),new THREE.MeshLambertMaterial({color:0xfacc15}));bodyP.position.y=1;player.add(bodyP);
+let head=new THREE.Mesh(new THREE.SphereGeometry(0.55,12,12),new THREE.MeshLambertMaterial({color:0xffc9a3}));head.position.y=2.5;player.add(head);
+scene.add(player);
+let px=0,pz=18,vy=0,angle=0,speed=0,joyX=0,joyY=0;
+let keys={};
+addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+
+// JOYSTICK HP
+let joy=document.getElementById('joy'),knob=document.getElementById('knob'),drag=false;
+joy.addEventListener('touchstart',e=>drag=true);joy.addEventListener('touchend',()=>{drag=false;joyX=0;joyY=0;knob.style.left='31px';knob.style.top='31px';});
+joy.addEventListener('touchmove',e=>{if(!drag)return;let r=joy.getBoundingClientRect();let t=e.touches[0];let dx=t.clientX-(r.left+55),dy=t.clientY-(r.top+55);dx=Math.max(-30,Math.min(30,dx));dy=Math.max(-30,Math.min(30,dy));joyX=dx/30;joyY=dy/30;knob.style.left=(31+dx)+'px';knob.style.top=(31+dy)+'px';});
+
+function jump(){if(player.position.y<0.1)vy=5;}
+function honk(){document.getElementById('info').innerText='📯 Tin! Tin! Permisi numpang lewat!';setTimeout(()=>document.getElementById('info').innerText='Selamat datang di Longkali! Jalan-jalan keliling desa',1500);}
+function startGame(){document.getElementById('start').style.display='none';}
+function loop(){
+requestAnimationFrame(loop);
+let mx=joyX,my=joyY;
+if(keys['w']||keys['arrowup'])my=-1;if(keys['s']||keys['arrowdown'])my=1;if(keys['a']||keys['arrowleft'])mx=-1;if(keys['d']||keys['arrowright'])mx=1;
+if(keys[' '])jump();
+if(mx||my){angle=Math.atan2(mx,-my);player.rotation.y=angle;speed=0.14;px+=Math.sin(angle)*speed;pz+=Math.cos(angle)*speed;}
+px=Math.max(-45,Math.min(45,px));pz=Math.max(-45,Math.min(45,pz));
+vy-=0.2;player.position.y+=vy*0.15;if(player.position.y<0){player.position.y=0;vy=0;}
+player.position.set(px,player.position.y,pz);
+// Kamera ikut dari belakang - MODE 3D ONLY
+let cx=px-Math.sin(angle)*9,cz=pz-Math.cos(angle)*9;
+cam.position.x+=(cx-cam.position.x)*0.1;cam.position.z+=(cz-cam.position.z)*0.1;cam.position.y+=(7-cam.position.y)*0.1;cam.lookAt(px,2,pz);
+ren.render(scene,cam);
+}
+loop();
+</script></body></html>
