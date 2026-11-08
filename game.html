@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LongkaliVerse</title>
+<style>
+body{margin:0;font-family:Arial;background:#0f172a;color:#fff;overflow:hidden}
+#header{position:fixed;top:0;left:0;right:0;z-index:20;background:#0e4a5a;padding:10px 12px;display:flex;justify-content:space-between}
+#header h1{margin:0;font-size:22px}#header h1 span{font-size:11px;background:#f59e0b;color:#000;padding:3px 7px;border-radius:6px}
+#header .r{text-align:right;font-size:11px}
+#header .r b{background:#134e4a;padding:3px 8px;border-radius:20px}
+#marquee{position:fixed;top:56px;left:0;right:0;z-index:20;background:#facc15;color:#000;font-size:13px;font-weight:700;padding:6px;overflow:hidden;white-space:nowrap}
+#marquee span{display:inline-block;animation:j 18s linear infinite}@keyframes j{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+#mapWrap{position:fixed;top:82px;left:0;right:0;bottom:62px;background:#0f172a}
+canvas{display:block}
+#card{position:absolute;top:12px;left:12px;z-index:15;background:#fff;color:#000;border-radius:14px;padding:10px 14px;min-width:140px;border:2px solid #0ea5e9}
+#card small{letter-spacing:2px;color:#0ea5e9;font-weight:900;font-size:11px}
+#card b{font-size:30px}
+#card p{margin:2px 0 0;font-size:11px;color:#64748b}
+#online{position:absolute;top:92px;left:12px;z-index:15;background:#16a34a;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:700}
+#side{position:absolute;top:12px;right:12px;z-index:15;display:flex;flex-direction:column;gap:8px}
+#side button{width:44px;height:44px;border-radius:12px;border:none;background:#fff;font-size:22px}
+#btnJalan{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:15;background:#0e4a5a;color:#fff;border:none;padding:13px 26px;border-radius:30px;font-size:16px;font-weight:800}
+#btnKembali{position:fixed;top:12px;left:12px;z-index:30;display:none;background:#ef4444;color:#fff;border:none;padding:10px 14px;border-radius:20px;font-weight:800}
+#modeLabel{position:fixed;top:12px;right:12px;z-index:30;display:none;background:rgba(0,0,0,.7);padding:8px 12px;border-radius:20px;font-size:12px}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#fdf6e3;display:flex;padding:6px 0 8px}
+#nav button{flex:1;background:none;border:none;font-size:11px;color:#57534e;display:flex;flex-direction:column;align-items:center}
+#nav button.on{color:#0e4a5a;font-weight:900}
+#nav button span{font-size:22px}
+.page{position:fixed;top:82px;left:0;right:0;bottom:62px;z-index:25;background:#f1f5f9;color:#111;display:none;overflow:auto;padding:16px}
+.card{background:#fff;padding:14px;border-radius:14px;margin-bottom:10px}
+.page input{width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;margin:6px 0}
+.page button{width:100%;padding:12px;border:none;border-radius:10px;background:#0e4a5a;color:#fff;font-weight:800;margin-top:8px}
+#kosongLabel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;background:rgba(0,0,0,.6);padding:12px 18px;border-radius:14px;text-align:center;font-size:13px;pointer-events:none}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<div id="header"><div><h1>LongkaliVerse <span>DAY 2</span></h1></div><div class="r"><div id="jam">Sen, 9 Nov 2026 • 01.28 WIB</div><div><b>🌙 MALAM • 🌧️ HUJAN</b></div></div></div>
+<div id="marquee"><span>📣 Mau bangun apa duluan? Tulis di Info ya! &nbsp; • &nbsp; 🏠 LongkaliVerse masih kosong, ayo bangun bareng! &nbsp; • &nbsp; 🎮 Pencet Jalan-jalan buat keliling map!</span></div>
+<div id="mapWrap">
+<div id="kosongLabel">🌱 MAP MASIH KOSONG<br><small>Admin lagi bangun desa...</small></div>
+<div id="card"><small>WARGA</small><br><b>4.000</b><p>diperbarui 2026-11-08 17:44</p></div>
+<div id="online">🟢 <span id="onlineCount">1</span> warga online</div>
+<div id="side"><button onclick="zoomIn()">+</button><button onclick="zoomOut()">−</button><button>★</button></div>
+<button id="btnJalan" onclick="masukJalan()">🎮 Jalan-jalan</button>
+</div>
+<button id="btnKembali" onclick="keluarJalan()">⬅ Kembali ke Menu</button>
+<div id="modeLabel">🎮 MODE JALAN-JALAN • Geser untuk jalan</div>
+<div id="page-Info" class="page"><h2>📢 Info</h2><div class="card"><b>Selamat datang di LongkaliVerse!</b><p>Desa Longkali versi digital. Map masih kosong, ayo bangun bareng!</p><input placeholder="Mau bangun apa?"><button onclick="alert('Usulan terkirim!')">Kirim Usulan</button></div></div>
+<div id="page-KTP" class="page"><h2>🪪 KTP</h2><div class="card" style="background:#0e4a5a;color:#fff"><b id="namaKTP">WARGA LONGKALI</b><p>NIK: 6407 • LONGKALI • 0001</p><p>Desa Longkali, Loa Kulu, Kukar</p></div><input id="inNama" placeholder="Nama kamu..."><button onclick="document.getElementById('namaKTP').innerText=document.getElementById('inNama').value.toUpperCase();alert('KTP dibuat!')">Buat KTP</button></div>
+<div id="page-Klasemen" class="page"><h2>🏆 Klasemen</h2><div class="card">🥇 Hilmi - 1250 poin<br>🥈 Andi - 980 poin<br>🥉 Sari - 850 poin<br>4. Budi - 620 poin<br>5. Kamu - 100 poin</div></div>
+<div id="page-Pemilu" class="page"><h2>🗳️ Pemilu Kades</h2><div class="card"><b>Calon 01 - Hilmi</b><p>Visi: Longkali Maju Digital</p><button onclick="alert('Kamu memilih Hilmi!')">Pilih Hilmi</button></div><div class="card"><b>Calon 02 - Andi</b><p>Visi: Longkali Hijau</p><button onclick="alert('Kamu memilih Andi!')">Pilih Andi</button></div></div>
+<div id="page-Donasi" class="page"><h2>💖 Donasi</h2><div class="card"><b>Bantu bangun Longkali!</b><p>Target: Rp 500.000<br>Terkumpul: Rp 125.000</p></div><button onclick="alert('Donasi tercatat! Makasih!')">💖 Donasi Rp 10.000</button></div>
+<div id="page-Akun" class="page"><h2>👤 Akun</h2><div class="card"><b>Warga Longkali</b><p>Level: Warga Baru<br>Bergabung: 9 Nov 2026</p></div><button onclick="location.href='admin3d.html'">🛠️ Buka Admin</button></div>
+<div id="nav">
+<button class="on" onclick="bukaPage('Peta',this)"><span>🗺️</span>Peta</button>
+<button onclick="bukaPage('Info',this)"><span>📢</span>Info</button>
+<button onclick="bukaPage('KTP',this)"><span>🪪</span>KTP</button>
+<button onclick="bukaPage('Klasemen',this)"><span>🏆</span>Klasemen</button>
+<button onclick="bukaPage('Pemilu',this)"><span>🗳️</span>Pemilu</button>
+<button onclick="bukaPage('Donasi',this)"><span>💖</span>Donasi</button>
+<button onclick="bukaPage('Akun',this)"><span>✅</span>Akun</button>
+</div>
+<script>
+function updateJam(){let d=new Date();let h=['Min','Sen','Sel','Rab','Kam','Jum','Sab'][d.getDay()];let b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()];document.getElementById('jam').innerText=h+', '+d.getDate()+' '+b+' '+d.getFullYear()+' • '+String(d.getHours()).padStart(2,'0')+'.'+String(d.getMinutes()).padStart(2,'0')+' WIB';}setInterval(updateJam,10000);updateJam();
+function bukaPage(n,btn){document.querySelectorAll('.page').forEach(p=>p.style.display='none');document.querySelectorAll('#nav button').forEach(b=>b.classList.remove('on'));if(n=='Peta'){document.getElementById('mapWrap').style.display='block';}else{document.getElementById('mapWrap').style.display='none';document.getElementById('page-'+n).style.display='block';}if(btn)btn.classList.add('on');if(modeJalan)keluarJalan();}
+let scene=new THREE.Scene();scene.background=new THREE.Color(0x87ceeb);
+let cam=new THREE.PerspectiveCamera(55,innerWidth/(innerHeight-144),0.1,500);
+let ren=new THREE.WebGLRenderer({antialias:true});ren.setSize(innerWidth,innerHeight-144);ren.domElement.style.position='absolute';ren.domElement.style.top='0';ren.domElement.style.left='0';document.getElementById('mapWrap').prepend(ren.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,0.95));let dl=new THREE.DirectionalLight(0xffffff,0.7);dl.position.set(20,30,10);scene.add(dl);
+let ground=new THREE.Mesh(new THREE.PlaneGeometry(110,110),new THREE.MeshLambertMaterial({color:0x4ade80}));ground.rotation.x=-Math.PI/2;scene.add(ground);
+function jalan(x1,z1,x2,z2){let len=Math.hypot(x2-x1,z2-z1);let a=Math.atan2(z2-z1,x2-x1);let m=new THREE.Mesh(new THREE.BoxGeometry(len,0.2,4.5),new THREE.MeshLambertMaterial({color:0x334155}));m.position.set((x1+x2)/2,0.1,(z1+z2)/2);m.rotation.y=-a;scene.add(m);let g=new THREE.Mesh(new THREE.BoxGeometry(len,0.25,0.4),new THREE.MeshLambertMaterial({color:0xfacc15}));g.position.set((x1+x2)/2,0.12,(z1+z2)/2);g.rotation.y=-a;scene.add(g);}
+function rumah(x,z,w,a,b,s,r){let g=new THREE.Group();g.position.set(x,0,z);s=s||1;let bm=new THREE.MeshLambertMaterial({color:w});let rm=new THREE.MeshLambertMaterial({color:a});if(b=='joglo'){let bb=new THREE.Mesh(new THREE.BoxGeometry(6*s,3.5*s,6*s),bm);bb.position.y=1.75*s;g.add(bb);let rr=new THREE.Mesh(new THREE.ConeGeometry(5.2*s,3.5*s,4),rm);rr.position.y=5.2*s;rr.rotation.y=Math.PI/4;g.add(rr);}else if(b=='modern'){let bb=new THREE.Mesh(new THREE.BoxGeometry(7*s,3*s,5*s),bm);bb.position.y=1.5*s;g.add(bb);let rr=new THREE.Mesh(new THREE.BoxGeometry(7.6*s,0.4*s,5.6*s),rm);rr.position.y=3.2*s;g.add(rr);}else if(b=='lantai2'){let b1=new THREE.Mesh(new THREE.BoxGeometry(6*s,3*s,6*s),bm);b1.position.y=1.5*s;g.add(b1);let b2=new THREE.Mesh(new THREE.BoxGeometry(5*s,3*s,5*s),bm);b2.position.y=4.5*s;g.add(b2);let rr=new THREE.Mesh(new THREE.ConeGeometry(4.8*s,2.5*s,4),rm);rr.position.y=7.2*s;rr.rotation.y=Math.PI/4;g.add(rr);}else if(b=='villa'){let bb=new THREE.Mesh(new THREE.BoxGeometry(10*s,4*s,8*s),bm);bb.position.y=2*s;g.add(bb);let rr=new THREE.Mesh(new THREE.ConeGeometry(7*s,3*s,4),rm);rr.position.y=5.5*s;rr.rotation.y=Math.PI/4;g.add(rr);}else if(b=='toko'){let bb=new THREE.Mesh(new THREE.BoxGeometry(6*s,4*s,5*s),bm);bb.position.y=2*s;g.add(bb);let p=new THREE.Mesh(new THREE.BoxGeometry(6.2*s,1.2*s,0.3),new THREE.MeshLambertMaterial({color:0xfacc15}));p.position.set(0,3.6*s,2.6*s);g.add(p);}else{let bb=new THREE.Mesh(new THREE.BoxGeometry(6*s,4*s,6*s),bm);bb.position.y=2*s;g.add(bb);let rr=new THREE.Mesh(new THREE.ConeGeometry(5*s,3*s,4),rm);rr.position.y=5.5*s;rr.rotation.y=Math.PI/4;g.add(rr);}let door=new THREE.Mesh(new THREE.BoxGeometry(1.4*s,2.2*s,0.2),new THREE.MeshLambertMaterial({color:0x78350f}));door.position.set(0,1.1*s,3.05*s);if(b!='toko')g.add(door);g.rotation.y=r||0;scene.add(g);}
+function pohon(x,z){let g=new THREE.Group();g.position.set(x,0,z);let t=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.5,3),new THREE.MeshLambertMaterial({color:0x78350f}));t.position.y=1.5;g.add(t);let l=new THREE.Mesh(new THREE.SphereGeometry(2.2,8,8),new THREE.MeshLambertMaterial({color:0x166534}));l.position.y=4.2;g.add(l);scene.add(g);}
+function lampu(x,z){let t=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,5),new THREE.MeshLambertMaterial({color:0x111827}));t.position.set(x,2.5,z);scene.add(t);let s=new THREE.Mesh(new THREE.SphereGeometry(0.7,8,8),new THREE.MeshBasicMaterial({color:0xfde047}));s.position.set(x,5.2,z);scene.add(s);}
+
+// ===== MAP KOSONG - PASTE KODE DARI ADMIN DI SINI =====
+// Contoh kalau udah bikin di admin:
+// jalan(-20,0,20,0);
+// rumah(10,10,0xffffff,0xdc2626,'joglo',1,0);
+// =======================================================
+
+// PEMAIN
+let pemain=new THREE.Group();let badan=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.7,1.8,8),new THREE.MeshLambertMaterial({color:0xef4444}));badan.position.y=1.2;pemain.add(badan);let kepala=new THREE.Mesh(new THREE.SphereGeometry(0.6,8,8),new THREE.MeshLambertMaterial({color:0xfde68a}));kepala.position.y=2.6;pemain.add(kepala);scene.add(pemain);
+let yaw=0.8,pitch=0.9,dist=48,modeJalan=false;
+function updateCam(){if(!modeJalan){cam.position.set(Math.sin(yaw)*Math.cos(pitch)*dist,Math.sin(pitch)*dist,Math.cos(yaw)*Math.cos(pitch)*dist);cam.lookAt(0,0,0);}else{cam.position.set(pemain.position.x+Math.sin(yaw)*8,pemain.position.y+5,pemain.position.z+Math.cos(yaw)*8);cam.lookAt(pemain.position.x,pemain.position.y+2,pemain.position.z);}}updateCam();
+function masukJalan(){modeJalan=true;document.getElementById('header').style.display='none';document.getElementById('marquee').style.display='none';document.getElementById('nav').style.display='none';document.getElementById('kosongLabel').style.display='none';document.getElementById('mapWrap').style.top='0';document.getElementById('mapWrap').style.bottom='0';document.getElementById('btnKembali').style.display='block';document.getElementById('modeLabel').style.display='block';ren.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();updateCam();}
+function keluarJalan(){modeJalan=false;document.getElementById('header').style.display='flex';document.getElementById('marquee').style.display='block';document.getElementById('nav').style.display='flex';document.getElementById('kosongLabel').style.display='block';document.getElementById('mapWrap').style.top='82px';document.getElementById('mapWrap').style.bottom='62px';document.getElementById('btnKembali').style.display='none';document.getElementById('modeLabel').style.display='none';ren.setSize(innerWidth,innerHeight-144);cam.aspect=innerWidth/(innerHeight-144);cam.updateProjectionMatrix();updateCam();}
+function zoomIn(){dist=Math.max(15,dist-5);updateCam();}
+function zoomOut(){dist=Math.min(90,dist+5);updateCam();}
+let isDrag=false,lastX=0,lastY=0;
+ren.domElement.addEventListener('pointerdown',e=>{isDrag=true;lastX=e.clientX;lastY=e.clientY;});
+ren.domElement.addEventListener('pointermove',e=>{if(!isDrag)return;if(modeJalan){pemain.position.x=Math.max(-48,Math.min(48,pemain.position.x+(e.clientX-lastX)*0.08));pemain.position.z=Math.max(-48,Math.min(48,pemain.position.z+(e.clientY-lastY)*0.08));}else{yaw-=(e.clientX-lastX)*0.01;pitch=Math.max(0.2,Math.min(1.3,pitch+(e.clientY-lastY)*0.01));}lastX=e.clientX;lastY=e.clientY;updateCam();});
+addEventListener('pointerup',()=>isDrag=false);
+(function loop(){requestAnimationFrame(loop);ren.render(scene,cam);})();
+</script></body></html>
