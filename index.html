@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LongkaliVerse</title>
+<!-- VERSI ALL2 - KALO MASIH KOSONG BERARTI FILE LAMA BELUM KEGANTI -->
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#0f172a;color:#fff;overflow:hidden}
+#header{position:fixed;top:0;left:0;right:0;z-index:999;background:#0e4a5a;padding:10px 12px;display:flex;justify-content:space-between}
+#header h1{margin:0;font-size:22px}#header h1 span{font-size:11px;background:#f59e0b;color:#000;padding:3px 7px;border-radius:6px}
+#header .r{text-align:right;font-size:11px}
+#header .r b{background:#134e4a;padding:3px 8px;border-radius:20px}
+#uangBar{background:#f59e0b;color:#000;font-weight:900;padding:4px 10px;border-radius:20px;font-size:12px;margin-top:4px;display:inline-block}
+#marquee{position:fixed;top:56px;left:0;right:0;z-index:999;background:#facc15;color:#000;font-size:13px;font-weight:700;padding:6px;overflow:hidden;white-space:nowrap;pointer-events:none}
+#marquee span{display:inline-block;animation:j 18s linear infinite}@keyframes j{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+#mapWrap{position:fixed;top:82px;left:0;right:0;bottom:62px;background:#0f172a;z-index:1}
+#mapWrap canvas{position:absolute !important;top:0 !important;left:0 !important;z-index:1 !important}
+#card{position:absolute;top:12px;left:12px;z-index:50;background:#fff;color:#000;border-radius:14px;padding:10px 14px;min-width:140px;border:2px solid #0ea5e9;pointer-events:none}
+#card small{letter-spacing:2px;color:#0ea5e9;font-weight:900;font-size:11px}
+#card b{font-size:30px}
+#card p{margin:2px 0 0;font-size:11px;color:#64748b}
+#online{position:absolute;top:92px;left:12px;z-index:50;background:#16a34a;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:700;pointer-events:none}
+#side{position:absolute;top:12px;right:12px;z-index:100;display:flex;flex-direction:column;gap:8px}
+#side button{width:44px;height:44px;border-radius:12px;border:none;background:#fff;font-size:22px;cursor:pointer}
+#btnJalan{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:100;background:#0e4a5a;color:#fff;border:none;padding:13px 26px;border-radius:30px;font-size:16px;font-weight:800;cursor:pointer}
+#btnKembali{position:fixed;top:12px;left:12px;z-index:9999;display:none;background:#ef4444;color:#fff;border:none;padding:10px 14px;border-radius:20px;font-weight:800;cursor:pointer}
+#modeLabel{position:fixed;top:12px;right:12px;z-index:9999;display:none;background:rgba(0,0,0,.7);padding:8px 12px;border-radius:20px;font-size:12px;pointer-events:none}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:999;background:#fdf6e3;display:flex;padding:6px 0 8px}
+#nav button{flex:1;background:none;border:none;font-size:11px;color:#57534e;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:6px 0}
+#nav button.on{color:#0e4a5a;font-weight:900}
+#nav button span{font-size:22px;pointer-events:none}
+.page{position:fixed;top:82px;left:0;right:0;bottom:62px;z-index:900;background:#f1f5f9;color:#111;display:none;overflow:auto;padding:16px}
+.card{background:#fff;padding:14px;border-radius:14px;margin-bottom:10px}
+.page input{width:100%;padding:10px;border-radius:10px;border:1px solid #cbd5e1;margin:6px 0}
+.page button{width:100%;padding:12px;border:none;border-radius:10px;background:#0e4a5a;color:#fff;font-weight:800;margin-top:8px;cursor:pointer}
+#kosongLabel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;background:rgba(0,0,0,.6);padding:12px 18px;border-radius:14px;text-align:center;font-size:13px;pointer-events:none;display:none}
+#joystick{position:fixed;bottom:30px;left:20px;z-index:9999;width:130px;height:130px;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.6);border-radius:50%;display:none;touch-action:none}
+#knob{position:absolute;top:50%;left:50%;width:55px;height:55px;background:#fff;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 4px 10px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:24px;pointer-events:none}
+#btnLompat{position:fixed;bottom:45px;right:20px;z-index:9999;width:70px;height:70px;border-radius:50%;background:#f59e0b;border:3px solid #fff;color:#000;font-size:28px;font-weight:900;display:none;cursor:pointer}
+#npcDialog{position:fixed;bottom:180px;left:50%;transform:translateX(-50%);z-index:9999;display:none;background:#fff;color:#111;border-radius:14px;padding:12px 14px;max-width:85%;width:340px;box-shadow:0 8px 20px rgba(0,0,0,.4);border:2px solid #0e4a5a;pointer-events:none}
+#npcDialog b{color:#0e4a5a;font-size:14px}
+#npcDialog p{margin:4px 0 0;font-size:14px;line-height:1.4}
+#npcList{position:absolute;bottom:70px;left:12px;z-index:50;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:12px;font-size:12px;pointer-events:none;max-width:220px}
+#uangFloat{position:absolute;top:150px;left:12px;z-index:50;background:#f59e0b;color:#000;padding:8px 12px;border-radius:20px;font-weight:900;font-size:13px;pointer-events:none}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<div id="header"><div><h1 id="judulDesa">LongkaliVerse <span>DAY 2</span></h1></div><div class="r"><div id="jam">Sen, 9 Nov 2026</div><div><b id="cuacaLabel">🌙 MALAM • 🌧️ HUJAN</b></div><div><span id="uangBar">💰 Rp 50.000</span></div></div></div>
+<div id="marquee"><span id="marqueeText">Pengumuman</span></div>
+<div id="mapWrap">
+<div id="kosongLabel">🌱 MAP MASIH KOSONG</div>
+<div id="card"><small>WARGA</small><br><b id="wargaText">4.000</b><p id="wargaUpdate">diperbarui</p></div>
+<div id="online">🟢 <span id="onlineCount">1</span> warga online</div>
+<div id="uangFloat">💰 <span id="uangFloatText">Rp 50.000</span></div>
+<div id="npcList">👥 NPC: <span id="npcCount">0</span> orang<br><small id="npcNames">-</small></div>
+<div id="side"><button type="button" onclick="zoomIn()">+</button><button type="button" onclick="zoomOut()">−</button><button type="button" onclick="alert('Favorit!')">★</button></div>
+<button id="btnJalan" type="button" onclick="masukJalan()">🎮 Jalan-jalan</button>
+</div>
+<button id="btnKembali" type="button" onclick="keluarJalan()">⬅ Kembali ke Menu</button>
+<div id="modeLabel">🎮 MODE JALAN-JALAN • Deketin NPC buat ngobrol</div>
+<div id="joystick"><div id="knob">🕹️</div></div>
+<button id="btnLompat" type="button" onclick="lompat()">⬆️</button>
+<div id="npcDialog"><b id="npcDialogNama">Pak RT</b><p id="npcDialogIsi">Halo!</p><small>💬 Deketin NPC buat ngobrol • Jalan menjauh buat nutup</small></div>
+<div id="page-Info" class="page"><h2>📢 Info</h2><div class="card"><b>Selamat datang di LongkaliVerse!</b><p id="infoText">Desa Longkali versi digital.</p><p><b>📋 Usulan Warga:</b><br><span id="usulanList">Belum ada usulan</span></p><input id="inUsulan" placeholder="Mau bangun apa? Tulis di sini..."><button type="button" onclick="kirimUsulan()">Kirim Usulan</button></div><div class="card"><b>📣 Pengumuman</b><p id="pengumumanIsi">Pengumuman desa</p></div></div>
+<div id="page-KTP" class="page"><h2>🪪 KTP</h2><div class="card" style="background:#0e4a5a;color:#fff"><b id="namaKTP">WARGA LONGKALI</b><p id="nikKTP">NIK: 6407 • LONGKALI • 0001</p><p>Desa Longkali, Loa Kulu, Kukar</p><p>Level: <span id="levelKTP">Warga Baru</span></p></div><input id="inNama" placeholder="Nama kamu..."><button type="button" onclick="buatKTP()">Buat KTP</button></div>
+<div id="page-Klasemen" class="page"><h2>🏆 Klasemen</h2><div class="card" id="klasemenIsi">Loading...</div><div class="card"><b>🎯 Poin Kamu</b><p style="font-size:24px;font-weight:900"><span id="poinKamu">100</span> poin</p><button type="button" onclick="tambahPoin()">+ Tambah 10 Poin (Main)</button></div></div>
+<div id="page-Pemilu" class="page"><h2>🗳️ Pemilu Kades</h2><div class="card" id="pemiluIsi">Loading...</div><div class="card"><b>📊 Hasil Sementara</b><p id="hasilPemilu">Calon 01: 0 suara<br>Calon 02: 0 suara</p></div></div>
+<div id="page-Donasi" class="page"><h2>💖 Donasi</h2><div class="card"><b>Bantu bangun Longkali!</b><p>Target: <span id="targetDonasiText">Rp 500.000</span><br>Terkumpul: <span id="terkumpulDonasiText">Rp 0</span><br>Progress: <span id="progressDonasi">0%</span></p><div style="background:#e5e7eb;height:12px;border-radius:10px;overflow:hidden"><div id="barDonasi" style="background:#f59e0b;height:12px;width:0%"></div></div></div><div class="card" style="background:#fef3c7;border:2px solid #f59e0b"><b>💰 Uang Kamu: <span class="uangText">Rp 50.000</span></b></div><button type="button" onclick="donasi(10000)">💖 Donasi Rp 10.000</button><button type="button" onclick="donasi(50000)">💖 Donasi Rp 50.000</button></div>
+<div id="page-Akun" class="page"><h2>👤 Akun</h2><div class="card"><b id="namaAkun">Warga Longkali</b><p>Level: <span id="levelAkun">Warga Baru</span><br>Bergabung: <span id="tglGabung">9 Nov 2026</span><br>Poin: <span id="poinAkun">100</span> poin</p></div><div class="card" style="background:#0e4a5a;color:#fff"><b>💰 DOMPET</b><p style="font-size:28px;font-weight:900;margin:5px 0"><span class="uangText">Rp 50.000</span></p><button type="button" onclick="tambahUang(10000)" style="background:#f59e0b;color:#000">+ Tambah Rp 10.000 (Test)</button></div><div class="card"><b>🎒 INVENTARIS</b><p id="inventarisText">Belum ada barang</p></div><button type="button" onclick="alert('Akun kamu aman!')">👤 Lihat Profil</button></div>
+<div id="nav">
+<button id="nav-Peta" type="button" class="on" onclick="bukaPage('Peta',this)"><span>🗺️</span>Peta</button>
+<button id="nav-Info" type="button" onclick="bukaPage('Info',this)"><span>📢</span>Info</button>
+<button id="nav-KTP" type="button" onclick="bukaPage('KTP',this)"><span>🪪</span>KTP</button>
+<button id="nav-Klasemen" type="button" onclick="bukaPage('Klasemen',this)"><span>🏆</span>Klasemen</button>
+<button id="nav-Pemilu" type="button" onclick="bukaPage('Pemilu',this)"><span>🗳️</span>Pemilu</button>
+<button id="nav-Donasi" type="button" onclick="bukaPage('Donasi',this)"><span>💖</span>Donasi</button>
+<button id="nav-Akun" type="button" onclick="bukaPage('Akun',this)"><span>✅</span>Akun</button>
+</div>
+<script>
+// ✏️ EDIT MANUAL DI SINI
+var NAMA_DESA = "LongkaliVerse";
+var DAY = "DAY 2";
+var CUACA = "🌙 MALAM • 🌧️ HUJAN";
+var PENGUMUMAN = "📣 Selamat datang di LongkaliVerse! • 🏠 Desa udah mulai dibangun! • 🎮 Pencet Jalan-jalan buat keliling & ngobrol sama NPC! • 💖 Donasi buat bangun desa!";
+var INFO_TEXT = "Desa Longkali versi digital. Map udah terisi, ayo bangun bareng!";
+var UANG_AWAL = 50000;
+var TARGET_DONASI = 500000;
+var TERKUMPUL_DONASI = 0;
+var JUMLAH_WARGA = 4000;
+var WARGA_ONLINE = 1;
+var UPDATE_WARGA = "diperbarui 2026-11-08 17:44";
+var NAMA_PEMAIN = "Warga Longkali";
+var LEVEL_PEMAIN = "Warga Baru";
+var TANGGAL_GABUNG = "9 Nov 2026";
+var NIK_KTP = "NIK: 6407 • LONGKALI • 0001";
+var INVENTARIS = "Belum ada barang";
+var POIN_AWAL = 100;
+var DAFTAR_KLASEMEN = [["Hilmi",1250],["Andi",980],["Sari",850],["Budi",620],["Kamu",100]];
+var CALON_1_NAMA = "Hilmi";
+var CALON_1_VISI = "Longkali Maju - Bangun jalan & sekolah";
+var CALON_2_NAMA = "Andi";
+var CALON_2_VISI = "Longkali Hijau - Banyak pohon & bersih";
+var SUARA_1 = 0;
+var SUARA_2 = 0;
+var DAFTAR_NPC = [
+  ["Pak RT", 5, 5, "biru", "Selamat datang di Longkali! Jangan lupa jaga kebersihan ya!"],
+  ["Bu Sari", -8, 10, "pink", "Hari ini aku masak sayur lodeh, mampir ke rumahku yuk!"],
+  ["Bang Andi", 12, -8, "hijau", "Woi! Mau ikut mancing di sungai gak sore ini?"],
+  ["Mbah Joyo", -12, -12, "kuning", "Dulu desa ini masih hutan semua, nak..."],
+  ["Hilmi", 0, -15, "merah", "Halo! Aku Hilmi, admin desa ini!"],
+];
+var DAFTAR_RUMAH = [
+  [10, 10, "putih", "merah", "joglo", 1],
+  [-15, 5, "kuning", "coklat", "modern", 1],
+  [20, -15, "biru", "hitam", "toko", 1],
+  [-20, -15, "hijau", "merah", "lantai2", 1],
+  [15, 18, "pink", "coklat", "villa", 1],
+  [-8, -20, "putih", "hitam", "joglo", 1],
+];
+var DAFTAR_JALAN = [[-30, 0, 30, 0],[0, -30, 0, 30],[-30, -20, 30, -20],[-20, -30, -20, 30]];
+var DAFTAR_POHON = [[5, -5], [-5, 5], [25, 5], [-25, -5], [8, -12], [-18, 15], [22, 12], [-5, -18]];
+var DAFTAR_LAMPU = [[0, 5], [0, -5], [10, 0], [-10, 0]];
+var KECEPATAN_JALAN = 0.35;
+var BATAS_MAP = 48;
+var JARAK_NGOBROL = 4;
+// ⛔ STOP
+var UANG = UANG_AWAL;
+var TERKUMPUL = TERKUMPUL_DONASI;
+var POIN = POIN_AWAL;
+var modeJalan = false;
+function formatUang(n){return 'Rp '+n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function updateUang(){document.getElementById('uangBar').innerText='💰 '+formatUang(UANG);document.getElementById('uangFloatText').innerText=formatUang(UANG);document.querySelectorAll('.uangText').forEach(e=>e.innerText=formatUang(UANG));document.getElementById('terkumpulDonasiText').innerText=formatUang(TERKUMPUL);var prog=Math.min(100,Math.round(TERKUMPUL/TARGET_DONASI*100));document.getElementById('progressDonasi').innerText=prog+'%';document.getElementById('barDonasi').style.width=prog+'%';}
+function tambahUang(j){UANG+=j;updateUang();}
+function kurangiUang(j){if(UANG>=j){UANG-=j;updateUang();return true;}else{alert('Uang kurang!');return false;}}
+function donasi(j){if(kurangiUang(j)){TERKUMPUL+=j;updateUang();alert('Donasi berhasil! Makasih! 💖');}}
+function kirimUsulan(){var v=document.getElementById('inUsulan').value; if(!v){alert('Tulis dulu usulannya!');return;} document.getElementById('usulanList').innerText='• '+v; document.getElementById('inUsulan').value=''; alert('Usulan terkirim!');}
+function buatKTP(){var v=document.getElementById('inNama').value; if(!v){alert('Isi nama dulu!');return;} document.getElementById('namaKTP').innerText=v.toUpperCase(); document.getElementById('namaAkun').innerText=v; alert('KTP dibuat! Selamat datang, '+v+'!');}
+function tambahPoin(){POIN+=10; DAFTAR_KLASEMEN[4][1]=POIN; tampilKlasemen(); alert('+10 Poin! Total: '+POIN);}
+function tampilKlasemen(){var sorted=[...DAFTAR_KLASEMEN].sort((a,b)=>b[1]-a[1]);var medal=["🥇","🥈","🥉","4.","5."];var html="";sorted.forEach((k,i)=>{html+=medal[i]+' '+k[0]+' - '+k[1]+' poin<br>';});document.getElementById('klasemenIsi').innerHTML=html;document.getElementById('poinKamu').innerText=POIN;document.getElementById('poinAkun').innerText=POIN;}
+function tampilPemilu(){document.getElementById('pemiluIsi').innerHTML='<b>Calon 01 - '+CALON_1_NAMA+'</b><p>'+CALON_1_VISI+'</p><button type="button" onclick="pilih(1)">Pilih '+CALON_1_NAMA+'</button><br><br><b>Calon 02 - '+CALON_2_NAMA+'</b><p>'+CALON_2_VISI+'</p><button type="button" onclick="pilih(2)">Pilih '+CALON_2_NAMA+'</button>';document.getElementById('hasilPemilu').innerHTML=CALON_1_NAMA+': '+SUARA_1+' suara<br>'+CALON_2_NAMA+': '+SUARA_2+' suara';}
+function pilih(n){if(n==1){SUARA_1++;}else{SUARA_2++;} tampilPemilu(); alert('Kamu memilih Calon 0'+n+'!');}
+function terapkanEdit(){document.getElementById('judulDesa').innerHTML=NAMA_DESA+' <span>'+DAY+'</span>';document.getElementById('cuacaLabel').innerText=CUACA;document.getElementById('marqueeText').innerText=PENGUMUMAN;document.getElementById('pengumumanIsi').innerText=PENGUMUMAN;document.getElementById('infoText').innerText=INFO_TEXT;document.getElementById('wargaText').innerText=JUMLAH_WARGA.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');document.getElementById('onlineCount').innerText=WARGA_ONLINE;document.getElementById('wargaUpdate').innerText=UPDATE_WARGA;document.getElementById('namaAkun').innerText=NAMA_PEMAIN;document.getElementById('levelAkun').innerText=LEVEL_PEMAIN;document.getElementById('levelKTP').innerText=LEVEL_PEMAIN;document.getElementById('tglGabung').innerText=TANGGAL_GABUNG;document.getElementById('nikKTP').innerText=NIK_KTP;document.getElementById('inventarisText').innerText=INVENTARIS;document.getElementById('targetDonasiText').innerText=formatUang(TARGET_DONASI);document.getElementById('npcCount').innerText=DAFTAR_NPC.length;document.getElementById('npcNames').innerText=DAFTAR_NPC.map(n=>n[0]).join(', ');tampilKlasemen();tampilPemilu();updateUang();}
+terapkanEdit();
+function updateJam(){let d=new Date();let h=['Min','Sen','Sel','Rab','Kam','Jum','Sab'][d.getDay()];let b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()];document.getElementById('jam').innerText=h+', '+d.getDate()+' '+b+' '+d.getFullYear()+' • '+String(d.getHours()).padStart(2,'0')+'.'+String(d.getMinutes()).padStart(2,'0')+' WIB';}setInterval(updateJam,10000);updateJam();
+function bukaPage(n,btn){document.querySelectorAll('.page').forEach(p=>p.style.display='none');document.querySelectorAll('#nav button').forEach(b=>b.classList.remove('on'));if(n=='Peta'){document.getElementById('mapWrap').style.display='block';}else{document.getElementById('mapWrap').style.display='none';document.getElementById('page-'+n).style.display='block';}if(btn)btn.classList.add('on');if(modeJalan)keluarJalan();}
+let scene=new THREE.Scene();scene.background=new THREE.Color(0x87ceeb);
+let cam=new THREE.PerspectiveCamera(55,innerWidth/(innerHeight-144),0.1,500);
+let ren=new THREE.WebGLRenderer({antialias:true});ren.setSize(innerWidth,innerHeight-144);ren.domElement.style.position='absolute';ren.domElement.style.top='0';ren.domElement.style.left='0';ren.domElement.style.zIndex='1';ren.domElement.style.touchAction='none';document.getElementById('mapWrap').prepend(ren.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,0.95));let dl=new THREE.DirectionalLight(0xffffff,0.7);dl.position.set(20,30,10);scene.add(dl);
+let ground=new THREE.Mesh(new THREE.PlaneGeometry(110,110),new THREE.MeshLambertMaterial({color:0x4ade80}));ground.rotation.x=-Math.PI/2;scene.add(ground);
+function jalan(x1,z1,x2,z2){let len=Math.hypot(x2-x1,z2-z1);let a=Math.atan2(z2-z1,x2-x1);let m=new THREE.Mesh(new THREE.BoxGeometry(len,0.2,4.5),new THREE.MeshLambertMaterial({color:0x334155}));m.position.set((x1+x2)/2,0.1,(z1+z2)/2);m.rotation.y=-a;scene.add(m);let g=new THREE.Mesh(new THREE.BoxGeometry(len,0.25,0.4),new THREE.MeshLambertMaterial({color:0xfacc15}));g.position.set((x1+x2)/2,0.12,(z1+z2)/2);g.rotation.y=-a;scene.add(g);}
+function warnaWarna(w){if(w=="putih")return 0xffffff; if(w=="kuning")return 0xfacc15; if(w=="biru")return 0x3b82f6; if(w=="hijau")return 0x22c55e; if(w=="pink")return 0xec4899; return 0xffffff;}
+function warnaAtap(a){if(a=="merah")return 0xdc2626; if(a=="coklat")return 0x78350f; if(a=="hitam")return 0x111827; if(a=="biru")return 0x1d4ed8; return 0xdc2626;}
+function warnaBaju(w){if(w=="merah")return 0xef4444; if(w=="biru")return 0x3b82f6; if(w=="hijau")return 0x22c55e; if(w=="kuning")return 0xfacc15; if(w=="pink")return 0xec4899; if(w=="ungu")return 0x8b5cf6; if(w=="putih")return 0xffffff; if(w=="hitam")return 0x1f2937; return 0x3b82f6;}
+function rumah(x,z,w,a,b,s,r){let g=new THREE.Group();g.position.set(x,0,z);s=s||1;let bm=new THREE.MeshLambertMaterial({color:warnaWarna(w)});let rm=new THREE.MeshLambertMaterial({color:warnaAtap(a)});if(b=='joglo'){let bb=new THREE.Mesh(new THREE.BoxGeometry(6*s,3.5*s,6*s),bm);bb.position.y=1.75*s;g.add(bb);let rr=new THREE.Mesh(new THREE.ConeGeometry(5.2*s,3.5*s,4),rm);rr.position.y=5.2*s;rr.rotation.y=Math.PI/4;g.add(rr);}else if(b=='modern'){let bb=new THREE.Mesh(new THREE.BoxGeometry(7*s,3*s,5*s),bm);bb.position.y=1.5*s;g.add(bb);let rr=new THREE.Mesh(new THREE.BoxGeometry(7.6*s,0.4*s,5.6*s),rm);rr.position.y=3.2*s;g.add(rr);}else if(b=='lantai2'){let b1=new THREE.Mesh(new THREE.BoxGeometry(6*s,3*s,6*s),bm);b1.position.y=1.5*s;g.add(b1);let b2=new THREE.Mesh(new THREE.BoxGeometry(5*s,3*s,5*s),bm);b2.position.y=4.5*s;g.add(b2);let rr=new THREE.Mesh(new THREE.ConeGeometry(4.8*s,2.5*s,4),rm);rr.position.y=7.2*s;rr.rotation.y=Math.PI/4;g.add(rr);}else if(b=='villa'){let bb=new THREE.Mesh(new THREE.BoxGeometry(10*s,4*s,8*s),bm);bb.position.y=2*s;g.add(bb);let rr=new THREE.Mesh(new THREE.ConeGeometry(7*s,3*s,4),rm);rr.position.y=5.5*s;rr.rotation.y=Math.PI/4;g.add(rr);}else if(b=='toko'){let bb=new THR
