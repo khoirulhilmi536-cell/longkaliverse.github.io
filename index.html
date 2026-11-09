@@ -56,8 +56,8 @@ canvas{display:block}
 <button id="btnLompat" onclick="lompat()">⬆️</button>
 <div id="page-Info" class="page"><h2>📢 Info</h2><div class="card"><b>Selamat datang di LongkaliVerse!</b><p>Desa Longkali versi digital. Map masih kosong, ayo bangun bareng!</p><input placeholder="Mau bangun apa?"><button onclick="alert('Usulan terkirim!')">Kirim Usulan</button></div></div>
 <div id="page-KTP" class="page"><h2>🪪 KTP</h2><div class="card" style="background:#0e4a5a;color:#fff"><b id="namaKTP">WARGA LONGKALI</b><p>NIK: 6407 • LONGKALI • 0001</p><p>Desa Longkali, Loa Kulu, Kukar</p></div><input id="inNama" placeholder="Nama kamu..."><button onclick="document.getElementById('namaKTP').innerText=document.getElementById('inNama').value.toUpperCase();alert('KTP dibuat!')">Buat KTP</button></div>
-<div id="page-Donasi" class="page"><h2>💖 Donasi</h2><div class="card"><b>Bantu bangun Longkali!</b><p>Target: Rp 500.000<br>Terkumpul: Rp 0 </p></div><div class="card" style="background:#fef3c7;border:2px solid #f59e0b"><b>💰 Uang Kamu: <span class="uangText">Rp 50.000</span></b><p style="font-size:13px">Uang ini cuma bisa ditambah lewat codingan sama Admin, bukan dari tombol.</p></div><button onclick="alert('Donasi tercatat! Makasih!')">💖 Donasi Rp 10.000</button></div>
-<div id="page-Akun" class="page"><h2>👤 Akun</h2><div class="card"><b>Warga Longkali</b><p>Level: Warga Baru<br>Bergabung: 9 Nov 2026</p></div><div class="card" style="background:#0e4a5a;color:#fff"><b>💰 DOMPET</b><p style="font-size:28px;font-weight:900;margin:5px 0"><span class="uangText">Rp 50.000</span></p><p style="font-size:12px;opacity:.8">Mau nambah? Minta ke Admin, Admin edit di codingan.</p></div><button onclick="alert('Akun kamu aman!')">👤 Lihat Profil</button></div>
+<div id="page-Donasi" class="page"><h2>💖 Donasi</h2><div class="card"><b>Bantu bangun Longkali!</b><p>Target: Rp 500.000<br>Terkumpul: Rp 0 </p></div><div class="card" style="background:#fef3c7;border:2px solid #f59e0b"><b>💰 Uang Kamu: <span class="uangText">Rp 0</span></b><p style="font-size:13px">Uang ini cuma bisa ditambah lewat codingan sama Admin, bukan dari tombol.</p></div><button onclick="alert('Donasi tercatat! Makasih!')">💖 Donasi Rp 10.000</button></div>
+<div id="page-Akun" class="page"><h2>👤 Akun</h2><div class="card"><b>Warga Longkali</b><p>Level: Warga Baru<br>Bergabung: 9 Nov 2026</p></div><div class="card" style="background:#0e4a5a;color:#fff"><b>💰 DOMPET</b><p style="font-size:28px;font-weight:900;margin:5px 0"><span class="uangText">Rp 0</span></p><p style="font-size:12px;opacity:.8">Mau nambah? Minta ke Admin, Admin edit di codingan.</p></div><button onclick="alert('Akun kamu aman!')">👤 Lihat Profil</button></div>
 <div id="nav">
 <button class="on" onclick="bukaPage('Peta',this)"><span>🗺️</span>Peta</button>
 <button onclick="bukaPage('Info',this)"><span>📢</span>Info</button>
@@ -67,7 +67,7 @@ canvas{display:block}
 </div>
 <script>
 // ===== 💰 SETTING UANG - EDIT DI SINI AJA =====
-let UANG = 50000;
+let UANG = 0;
 // ==============================================
 function formatUang(n){return 'Rp '+n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
 function updateUang(){
