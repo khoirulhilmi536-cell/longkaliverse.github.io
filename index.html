@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LongkaliVerse</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#0f172a;color:#fff;overflow:hidden}
+#header{position:fixed;top:0;left:0;right:0;z-index:200;background:#0e4a5a;padding:10px 12px;display:flex;justify-content:space-between}
+#header h1{margin:0;font-size:22px}#header h1 span{font-size:11px;background:#f59e0b;color:#000;padding:3px 7px;border-radius:6px}
+#header .r{text-align:right;font-size:11px}
+#header .r b{background:#134e4a;padding:3px 8px;border-radius:20px}
+#marquee{position:fixed;top:56px;left:0;right:0;z-index:200;background:#facc15;color:#000;font-size:13px;font-weight:700;padding:6px;overflow:hidden;white-space:nowrap}
+#marquee span{display:inline-block;animation:j 18s linear infinite}@keyframes j{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+#mapWrap{position:fixed;top:82px;left:0;right:0;bottom:62px;background:#22c55e;z-index:1}
+#mapWrap canvas{position:absolute !important;top:0 !important;left:0 !important;z-index:1 !important}
+#card{position:absolute;top:12px;left:12px;z-index:30;background:#fff;color:#000;border-radius:14px;padding:10px 14px;min-width:140px;border:2px solid #0ea5e9;pointer-events:none}
+#card small{letter-spacing:2px;color:#0ea5e9;font-weight:900;font-size:11px}
+#card b{font-size:30px}
+#card p{margin:2px 0 0;font-size:11px;color:#64748b}
+#online{position:absolute;top:92px;left:12px;z-index:30;background:#16a34a;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:700;pointer-events:none}
+#side{position:absolute;top:12px;right:12px;z-index:30;display:flex;flex-direction:column;gap:8px}
+#side button{width:44px;height:44px;border-radius:12px;border:none;background:#fff;font-size:22px;cursor:pointer}
+#btnJalan{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:30;background:#0e4a5a;color:#fff;border:none;padding:13px 26px;border-radius:30px;font-size:16px;font-weight:800;cursor:pointer;white-space:nowrap}
+#btnKembali{position:fixed;top:12px;left:12px;z-index:300;display:none;background:#ef4444;color:#fff;border:none;padding:10px 14px;border-radius:20px;font-weight:800;cursor:pointer}
+#modeLabel{position:fixed;top:12px;right:12px;z-index:300;display:none;background:rgba(0,0,0,.7);padding:8px 12px;border-radius:20px;font-size:12px;pointer-events:none}
+/* ANALOG JOYSTICK */
+#joystick{position:fixed;bottom:30px;left:20px;z-index:300;width:130px;height:130px;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.6);border-radius:50%;display:none;touch-action:none}
+#knob{position:absolute;top:50%;left:50%;width:55px;height:55px;background:#fff;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 4px 10px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:24px}
+#btnLompat{position:fixed;bottom:45px;right:20px;z-index:300;width:70px;height:70px;border-radius:50%;background:#f59e0b;border:3px solid #fff;color:#000;font-size:28px;font-weight:900;display:none;cursor:pointer}
+#kosong{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;background:rgba(0,0,0,.6);padding:12px 18px;border-radius:14px;text-align:center;font-size:13px;pointer-events:none}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fdf6e3;display:flex;padding:6px 0 8px}
+#nav button{flex:1;background:none;border:none;font-size:11px;color:#57534e;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:6px 0}
+#nav button.on{color:#0e4a5a;font-weight:900}
+#nav button span{font-size:22px}
+.page{position:fixed;top:82px;left:0;right:0;bottom:62px;z-index:150;background:#f1f5f9;color:#111;display:none;overflow:auto;padding:16px}
+.card{background:#fff;padding:14px;border-radius:14px;margin-bottom:10px}
+.page input{width:100%;padding:12px;border-radius:10px;border:1px solid #cbd5e1;margin:6px 0;font-size:14px}
+.page button{width:100%;padding:12px;border:none;border-radius:10px;background:#0e4a5a;color:#fff;font-weight:800;margin-top:8px;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="header"><div><h1>LongkaliVerse <span>DAY 2</span></h1></div><div class="r"><div id="jam">Sen, 9 Nov 2026</div><div><b>🌙 MALAM • 🌧️ HUJAN</b></div></div></div>
+<div id="marquee"><span>🏠 LongkaliVerse masih kosong, ayo bangun bareng! • 🎮 Pencet Jalan-jalan buat keliling map!</span></div>
+
+<div id="mapWrap">
+<div id="kosong">🌱 MAP MASIH KOSONG<br><small>Admin lagi bangun desa...</small></div>
+<div id="card"><small>WARGA</small><br><b id="wargaCount">0</b><p>diperbarui 2026-11-08 17:44</p></div>
+<div id="online">🟢 <span id="onlineCount">0</span> warga online</div>
+<div id="side"><button onclick="zoomIn()">+</button><button onclick="zoomOut()">−</button><button onclick="alert('Favorit!')">★</button></div>
+<button id="btnJalan" onclick="masukJalan()">🎮 Jalan-jalan</button>
+</div>
+
+<button id="btnKembali" onclick="keluarJalan()">⬅ Kembali ke Menu</button>
+<div id="modeLabel">🎮 MODE JALAN-JALAN • Pakai Analog</div>
+
+<!-- ANALOG + LOMPAT -->
+<div id="joystick"><div id="knob">🕹️</div></div>
+<button id="btnLompat" onclick="lompat()">⬆️</button>
+
+<div id="page-Info" class="page"><h2>📢 Info</h2><div class="card"><b>Selamat datang di LongkaliVerse!</b><p>Desa Longkali versi digital. Map masih kosong, ayo bangun bareng!</p><input placeholder="Mau bangun apa?"><button onclick="alert('Usulan terkirim!')">Kirim Usulan</button></div></div>
+<div id="page-KTP" class="page"><h2>🪪 KTP</h2><div class="card" style="background:#0e4a5a;color:#fff"><b id="namaKTP">WARGA LONGKALI</b><p>NIK: 6407 • LONGKALI • 0001</p></div><input id="inNama" placeholder="Nama kamu..."><button onclick="document.getElementById('namaKTP').innerText=document.getElementById('inNama').value.toUpperCase();alert('KTP dibuat!')">Buat KTP</button></div>
+<div id="page-Klasemen" class="page"><h2>🏆 Klasemen</h2><div class="card">🥇 Hilmi - 1250 poin<br>🥈 Andi - 980 poin<br>🥉 Sari - 850 poin</div></div>
+<div id="page-Donasi" class="page"><h2>💖 Donasi</h2><div class="card"><b>Bantu bangun Longkali!</b><p>Target: Rp 500.000<br>Terkumpul: Rp 125.000</p></div><button onclick="alert('Donasi tercatat!')">💖 Donasi Rp 10.000</button></div>
+<div id="page-Akun" class="page"><h2>👤 Akun</h2><div class="card"><b>Warga Longkali</b><p>Level: Warga Baru</p></div><button onclick="location.href='admin3d.html'">🛠️ Buka Admin</button></div>
+
+<div id="nav">
+<button class="on" onclick="bukaPage('Peta',this)"><span>🗺️</span>Peta</button>
+<button onclick="bukaPage('Info',this)"><span>📢</span>Info</button>
+<button onclick="bukaPage('KTP',this)"><span>🪪</span>KTP</button>
+<button onclick="bukaPage('Klasemen',this)"><span>🏆</span>Klasemen</button>
+<button onclick="bukaPage('Donasi',this)"><span>💖</span>Donasi</button>
+<button onclick="bukaPage('Akun',this)"><span>✅</span>Akun</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+function bukaPage(n,btn){
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.remove('on'));
+  if(n=='Peta'){document.getElementById('mapWrap').style.display='block';}
+  else{document.getElementById('mapWrap').style.display='none';document.getElementById('page-'+n).style.display='block';}
+  if(btn)btn.classList.add('on');
+  if(typeof modeJalan!=='undefined' && modeJalan) keluarJalan();
+}
+function updateJam(){let d=new Date();let h=['Min','Sen','Sel','Rab','Kam','Jum','Sab'][d.getDay()];let b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()];document.getElementById('jam').innerText=h+', '+d.getDate()+' '+b+' '+d.getFullYear()+' • '+String(d.getHours()).padStart(2,'0')+'.'+String(d.getMinutes()).padStart(2,'0')+' WIB';}setInterval(updateJam,10000);updateJam();
+
+let modeJalan=false, yaw=0.8, pitch=0.9, dist=48;
+let scene, cam, ren, pemain;
+let joyX=0, joyY=0, isJoy=false, joyId=null;
+let lompatY=0, isLompat=false;
+
+function lompat(){ if(isLompat) return; isLompat=true; lompatY=0; }
+
+try{
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x87ceeb);
+  cam=new THREE.PerspectiveCamera(55, innerWidth/(innerHeight-144), 0.1, 500);
+  ren=new THREE.WebGLRenderer({antialias:true}); ren.setSize(innerWidth, innerHeight-144);
+  ren.domElement.style.position='absolute'; ren.domElement.style.top='0'; ren.domElement.style.left='0'; ren.domElement.style.zIndex='1';
+  document.getElementById('mapWrap').prepend(ren.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+  let dl=new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(20,30,10); scene.add(dl);
+  let ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200), new THREE.MeshLambertMaterial({color:0x22c55e}));
+  ground.rotation.x=-Math.PI/2; ground.position.y=0; scene.add(ground);
+  let jalanTengah=new THREE.Mesh(new THREE.BoxGeometry(200,0.2,6), new THREE.MeshLambertMaterial({color:0x334155}));
+  jalanTengah.position.set(0,0.1,0); scene.add(jalanTengah);
+  let jalanTegak=new THREE.Mesh(new THREE.BoxGeometry(6,0.2,200), new THREE.MeshLambertMaterial({color:0x334155}));
+  jalanTegak.position.set(0,0.1,0); scene.add(jalanTegak);
+  pemain=new THREE.Group();
+  let badan=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.7,1.8,8), new THREE.MeshLambertMaterial({color:0xef4444})); badan.position.y=1.2; pemain.add(badan);
+  let kepala=new THREE.Mesh(new THREE.SphereGeometry(0.6,8,8), new THREE.MeshLambertMaterial({color:0xfde68a})); kepala.position.y=2.6; pemain.add(kepala);
+  scene.add(pemain);
+  function updateCam(){ if(!modeJalan){ cam.position.set(Math.sin(yaw)*Math.cos(pitch)*dist, Math.sin(pitch)*dist, Math.cos(yaw)*Math.cos(pitch)*dist); cam.lookAt(0,0,0);} else { cam.position.set(pemain.position.x+Math.sin(yaw)*8, pemain.position.y+5, pemain.position.z+Math.cos(yaw)*8); cam.lookAt(pemain.position.x, pemain.position.y+2, pemain.position.z);} }
+  window.updateCam = updateCam; updateCam();
+  let isDrag=false,lastX=0,lastY=0;
+  ren.domElement.addEventListener('pointerdown',e=>{isDrag=true;lastX=e.clientX;lastY=e.clientY;});
+  ren.domElement.addEventListener('pointermove',e=>{if(!isDrag)return; if(!modeJalan){ yaw-=(e.clientX-lastX)*0.01; pitch=Math.max(0.2,Math.min(1.3,pitch+(e.clientY-lastY)*0.01)); } lastX=e.clientX; lastY=e.clientY; updateCam();});
+  addEventListener('pointerup',()=>isDrag=false);
+  (function loop(){
+    requestAnimationFrame(loop);
+    // GERAK PAKE ANALOG
+    if(modeJalan && (joyX!=0 || joyY!=0)){
+      pemain.position.x = Math.max(-48, Math.min(48, pemain.position.x + joyX*0.35));
+      pemain.position.z = Math.max(-48, Math.min(48, pemain.position.z + joyY*0.35));
+      // Hadapin pemain ke arah jalan
+      if(joyX!=0||joyY!=0) pemain.rotation.y = Math.atan2(joyX, joyY);
+      updateCam();
+    }
+    // LOMPAT
+    if(isLompat){
+      lompatY += 0.25;
+      pemain.position.y = Math.sin(lompatY)*2.5;
+      if(lompatY>=Math.PI){ pemain.position.y=0; isLompat=false; }
+      updateCam();
+    }
+    ren.render(scene,cam);
+  })();
+}catch(e){ console.log('Map error:', e); }
+
+// ANALOG LOGIC
+let joyEl=document.getElementById('joystick');
+let knobEl=document.getElementById('knob');
+function joyStart(e){
+  isJoy=true; joyId=e.pointerId; joyEl.setPointerCapture(e.pointerId); joyMove(e);
+}
+function joyMove(e){
+  if(!isJoy || e.pointerId!==joyId) return;
+  let r=joyEl.getBoundingClientRect();
+  let cx=r.left+r.width/2, cy=r.top+r.height/2;
+  let dx=e.clientX-cx, dy=e.clientY-cy;
+  let max=40;
+  let len=Math.sqrt(dx*dx+dy*dy);
+  if(len>max){ dx=dx/len*max; dy=dy/len*max; }
+  knobEl.style.transform='translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px))';
+  joyX=dx/max; joyY=dy/max;
+}
+function joyEnd(e){
+  if(e.pointerId!==joyId) return;
+  isJoy=false; joyX=0; joyY=0;
+  knobEl.style.transform='translate(-50%,-50%)';
+}
+joyEl.addEventListener('pointerdown',joyStart);
+joyEl.addEventListener('pointermove',joyMove);
+joyEl.addEventListener('pointerup',joyEnd);
+joyEl.addEventListener('pointercancel',joyEnd);
+
+function masukJalan(){ modeJalan=true; document.getElementById('header').style.display='none'; document.getElementById('marquee').style.display='none'; document.getElementById('nav').style.display='none'; document.getElementById('kosong').style.display='none'; document.getElementById('mapWrap').style.top='0'; document.getElementById('mapWrap').style.bottom='0'; document.getElementById('btnKembali').style.display='block'; document.getElementById('modeLabel').style.display='block'; document.getElementById('joystick').style.display='block'; document.getElementById('btnLompat').style.display='block'; if(ren){ ren.setSize(innerWidth,innerHeight); cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); } if(window.updateCam) window.updateCam(); }
+function keluarJalan(){ modeJalan=false; joyX=0; joyY=0; document.getElementById('header').style.display='flex'; document.getElementById('marquee').style.display='block'; document.getElementById('nav').style.display='flex'; document.getElementById('kosong').style.display='block'; document.getElementById('mapWrap').style.top='82px'; document.getElementById('mapWrap').style.bottom='62px'; document.getElementById('btnKembali').style.display='none'; document.getElementById('modeLabel').style.display='none'; document.getElementById('joystick').style.display='none'; document.getElementById('btnLompat').style.display='none'; if(ren){ ren.setSize(innerWidth,innerHeight-144); cam.aspect=innerWidth/(innerHeight-144); cam.updateProjectionMatrix(); } if(window.updateCam) window.updateCam(); }
+function zoomIn(){ dist=Math.max(15,dist-5); if(window.updateCam) window.updateCam(); }
+function zoomOut(){ dist=Math.min(90,dist+5); if(window.updateCam) window.updateCam(); }
+</script></body></html>
